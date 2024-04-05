@@ -10,7 +10,7 @@ WPDUMP_MIRROR = "dumps.wikimedia.org"
 # Wiki name. Check the mirror's directory tree for this
 WPDUMP_WIKI = "enwiki"
 # Date target, usually in format "YYYYMMDD" or "latest"
-WPDUMP_DATE = "latest"
+WPDUMP_DATE = "20240401"
 # relative path on host machine; this will default to "wp_dump" but you can change it if you have multiple xmldumps
 TARGET_PATH = "wp_dump"
 
