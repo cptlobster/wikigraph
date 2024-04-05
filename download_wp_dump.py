@@ -8,7 +8,7 @@ import json
 from urllib import request
 from bz2 import BZ2Decompressor
 from rich.progress import Progress
-from timeit import default_timer as timer
+import time
 from datetime import timedelta
 
 # Mirror URL. Make sure that the mirror supports HTTPS.
@@ -99,6 +99,7 @@ def download_and_unzip(path: str,
                     # you should see that 'leftover' is the start of a new stream
                     # we have to start a new decompressor
                     dc = BZ2Decompressor()
+                time.sleep(0.001)
     if progress:
         progress.remove_task(current_dl)
         progress.console.print(f"Downloaded {sizeof_fmt(length)} ({sizeof_fmt(dc_length)} uncompressed)")
@@ -131,14 +132,14 @@ if __name__ == "__main__":
         overall_task = progress.add_task(f"Downloading {len(files)} files...", total=len(files))
         overall_bytes = 0
         overall_dc_bytes = 0
-        start = timer()
+        start = time.time()
         for n, path in enumerate(files, start=1):
             progress.console.print(f"({n} / {len(files)}) File {path}")
             nb, ndb = download_and_unzip(path, progress=progress)
             overall_bytes += nb
             overall_dc_bytes += ndb
             progress.update(overall_task, advance=1)
-        end = timer()
+        end = time.time()
         progress.console.print(f"Download completed.\n\n"
                                f"DOWNLOAD STATISTICS\n"
                                f"Size (compressed): {sizeof_fmt(overall_bytes)}\n"
