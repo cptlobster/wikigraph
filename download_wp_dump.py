@@ -99,6 +99,7 @@ def download_and_unzip(path: str,
                     # you should see that 'leftover' is the start of a new stream
                     # we have to start a new decompressor
                     dc = BZ2Decompressor()
+    progress.console.print(f"Downloaded {sizeof_fmt(length)} ({sizeof_fmt(dc_length)} uncompressed)")
     return (length, dc_length)
 
 
@@ -124,7 +125,7 @@ def download_dump(dump: str = None,
 
 
 if __name__ == "__main__":
-    with Progress() as progress:
+    with Progress(transient=True) as progress:
         md = get_metadata()
         files = get_files_in_dump(md)
         overall_task = progress.add_task(f"Downloading {len(files)} files...", total=len(files))
