@@ -99,7 +99,9 @@ def download_and_unzip(path: str,
                     # you should see that 'leftover' is the start of a new stream
                     # we have to start a new decompressor
                     dc = BZ2Decompressor()
-    progress.console.print(f"Downloaded {sizeof_fmt(length)} ({sizeof_fmt(dc_length)} uncompressed)")
+    if progress:
+        progress.remove_task(current_dl)
+        progress.console.print(f"Downloaded {sizeof_fmt(length)} ({sizeof_fmt(dc_length)} uncompressed)")
     return (length, dc_length)
 
 
@@ -112,16 +114,14 @@ def get_files_in_dump(metadata: dict, dump: str = None) -> list:
 def download_dump(dump: str = None,
                   mirror: str = None,
                   wiki: str = None,
-                  date: str = None) -> bool:
+                  date: str = None):
     dump = dump or WPDUMP_SOURCE
     mirror = mirror or WPDUMP_MIRROR
     wiki = wiki or WPDUMP_WIKI
     date = date or WPDUMP_DATE
     md = get_metadata()
-    success = True
     for path in get_files_in_dump(md, dump):
-        success = success and download_and_unzip(path, mirror, wiki, date)
-    return success
+        download_and_unzip(path, mirror, wiki, date)
 
 
 if __name__ == "__main__":
