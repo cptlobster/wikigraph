@@ -15,8 +15,8 @@ WPDUMP_MIRROR = "dumps.wikimedia.org"
 WPDUMP_WIKI = "enwiki"
 # Date target, usually in format "YYYYMMDD" or "latest"
 WPDUMP_DATE = "20240401"
-# relative path on host machine; this will default to "wp_dump" but you can change it if you have multiple xmldumps
-TARGET_PATH = "wp_dump"
+# relative path on host machine; this will default to "wp-data" but you can change it if you have multiple xmldumps
+TARGET_PATH = "wp-data"
 # xmldump to download and unzip
 WPDUMP_SOURCE = "articlesmultistreamdump"
 # Default chunk size (bytes)
