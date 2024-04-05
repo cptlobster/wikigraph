@@ -85,7 +85,7 @@ def download_and_unzip(path: str,
 def get_files_in_dump(metadata: dict, dump: str = None) -> list:
     """Get the list of files in a specific xmldump"""
     dump = dump or WPDUMP_SOURCE
-    return metadata["jobs"][dump]["files"].keys
+    return metadata["jobs"][dump]["files"].keys()
 
 
 def download_dump(dump: str = None,
