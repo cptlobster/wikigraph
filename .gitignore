@@ -1,0 +1,29 @@
+# ignore wikipedia data (I am not copying 20GB to git)
+wp-data
+
+# macOS
+.DS_Store
+
+# sbt specific
+dist/*
+target/
+lib_managed/
+src_managed/
+project/boot/
+project/plugins/project/
+project/local-plugins.sbt
+.history
+.ensime
+.ensime_cache/
+.sbt-scripted/
+local.sbt
+
+# Bloop
+.bsp
+
+# python virtualenvs
+.venv
+
+# the obvious IDE folders
+.idea
+.vscode
