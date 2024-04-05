@@ -2,11 +2,11 @@
 """Download a wiki from its xmldump source. Source is configurable by parameters to target a different wiki, date, or
 mirror.
 """
-from urllib import request
-import requests
+import requests as req
 import json
-import bz2
 
+from urllib import request
+from bz2 import BZ2Decompressor
 from rich.progress import Progress
 
 # Mirror URL. Make sure that the mirror supports HTTPS.
@@ -69,16 +69,23 @@ def download_and_unzip(path: str,
     wiki = wiki or WPDUMP_WIKI
     date = date or WPDUMP_DATE
     url = get_wd_url(path, mirror, wiki, date)
-    dc = bz2.BZ2Decompressor()
-    with requests.get(url, stream=True) as response:
+    dc = BZ2Decompressor()
+    leftover = b""
+    with req.get(url, stream=True) as response:
         length = int(response.headers['Content-Length'])
         if progress:
             current_dl = progress.add_task(f"Downloading {path}", total=length)
         with open(f"{TARGET_PATH}/{path.removesuffix('.bz2')}", "wb") as f:
             for chunk in response.iter_content(chunk_size=CHUNK_SIZE):
-                f.write(dc.decompress(chunk))
+                f.write(dc.decompress(leftover + chunk))
+                leftover = b""
                 if progress:
                     progress.update(current_dl, advance=CHUNK_SIZE)
+                if dc.eof:
+                    leftover = dc.unused_data
+                    # you should see that 'leftover' is the start of a new stream
+                    # we have to start a new decompressor
+                    dc = BZ2Decompressor()
     return True
 
 
