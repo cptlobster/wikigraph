@@ -85,7 +85,7 @@ def download_and_unzip(path: str,
     with req.get(url, stream=True) as response:
         length = int(response.headers['Content-Length'])
         if progress:
-            current_dl = progress.add_task(f"Downloading {path} ({sizeof_fmt(length)})", total=length)
+            current_dl = progress.add_task("Downloading {sizeof_fmt(length)}...", total=length)
         with open(f"{TARGET_PATH}/{path.removesuffix('.bz2')}", "wb") as f:
             for chunk in response.iter_content(chunk_size=CHUNK_SIZE):
                 decompressed = dc.decompress(leftover + chunk)
@@ -127,11 +127,12 @@ if __name__ == "__main__":
     with Progress() as progress:
         md = get_metadata()
         files = get_files_in_dump(md)
-        overall_task = progress.add_task("Downloading xmldumps", total=len(files))
+        overall_task = progress.add_task(f"Downloading {len(files)} files...", total=len(files))
         overall_bytes = 0
         overall_dc_bytes = 0
         start = timer()
-        for path in files:
+        for n, path in enumerate(files, start=1):
+            progress.console.print(f"({n} / {len(files)}) File {path}")
             nb, ndb = download_and_unzip(path, progress=progress)
             overall_bytes += nb
             overall_dc_bytes += ndb
