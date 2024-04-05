@@ -7,6 +7,8 @@ import requests
 import json
 import bz2
 
+from rich.progress import Progress
+
 # Mirror URL. Make sure that the mirror supports HTTPS.
 WPDUMP_MIRROR = "dumps.wikimedia.org"
 # Wiki name. Check the mirror's directory tree for this
@@ -17,6 +19,8 @@ WPDUMP_DATE = "20240401"
 TARGET_PATH = "wp_dump"
 # xmldump to download and unzip
 WPDUMP_SOURCE = "articlesmultistreamdump"
+# Default chunk size (bytes)
+CHUNK_SIZE = 100 * 1024
 
 
 def get_wd_url(path: str = "",
@@ -55,7 +59,8 @@ def get_metadata(mirror: str = None,
 def download_and_unzip(path: str,
                        mirror: str = None,
                        wiki: str = None,
-                       date: str = None) -> bool:
+                       date: str = None,
+                       progress: Progress = None) -> bool:
     """Download and unzip a file automatically.
 
     :param path: The relative path of the file to download
@@ -66,9 +71,14 @@ def download_and_unzip(path: str,
     url = get_wd_url(path, mirror, wiki, date)
     dc = bz2.BZ2Decompressor()
     with requests.get(url, stream=True) as response:
+        length = response.headers['Content-Length']
+        if progress:
+            current_dl = progress.add_task(f"Downloading {path}", total=length)
         with open(f"{TARGET_PATH}/{path.removesuffix('.bz2')}", "wb") as f:
-            for chunk in response.iter_content(chunk_size=100 * 1024):
+            for chunk in response.iter_content(chunk_size=CHUNK_SIZE):
                 f.write(dc.decompress(chunk))
+                if progress:
+                    progress.update(current_dl, advance=CHUNK_SIZE)
     return True
 
 
@@ -93,9 +103,10 @@ def download_dump(dump: str = None,
     return success
 
 if __name__ == "__main__":
-    print(f"Downloading dump \"{WPDUMP_SOURCE}\" from \"https://{WPDUMP_MIRROR}/{WPDUMP_WIKI}/{WPDUMP_DATE}\"")
-    print(f"Decompressing and saving files in {TARGET_PATH}")
-    if download_dump():
-        print("Complete.")
-    else:
-        print("An error occurred. See logs for details.")
+    with Progress(transient=True) as progress:
+        md = get_metadata()
+        files = get_files_in_dump(md)
+        overall_task = progress.add_task("Downloading xmldumps", total=len(files))
+        for path in files:
+            download_and_unzip(path, progress=progress)
+            progress.update(overall_task, advance=1)
