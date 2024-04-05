@@ -85,7 +85,7 @@ def download_and_unzip(path: str,
     with req.get(url, stream=True) as response:
         length = int(response.headers['Content-Length'])
         if progress:
-            current_dl = progress.add_task("Downloading {sizeof_fmt(length)}...", total=length)
+            current_dl = progress.add_task(f"Downloading {sizeof_fmt(length)}...", total=length)
         with open(f"{TARGET_PATH}/{path.removesuffix('.bz2')}", "wb") as f:
             for chunk in response.iter_content(chunk_size=CHUNK_SIZE):
                 decompressed = dc.decompress(leftover + chunk)
