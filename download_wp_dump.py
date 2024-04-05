@@ -71,7 +71,7 @@ def download_and_unzip(path: str,
     url = get_wd_url(path, mirror, wiki, date)
     dc = bz2.BZ2Decompressor()
     with requests.get(url, stream=True) as response:
-        length = response.headers['Content-Length']
+        length = int(response.headers['Content-Length'])
         if progress:
             current_dl = progress.add_task(f"Downloading {path}", total=length)
         with open(f"{TARGET_PATH}/{path.removesuffix('.bz2')}", "wb") as f:
@@ -103,7 +103,7 @@ def download_dump(dump: str = None,
     return success
 
 if __name__ == "__main__":
-    with Progress(transient=True) as progress:
+    with Progress() as progress:
         md = get_metadata()
         files = get_files_in_dump(md)
         overall_task = progress.add_task("Downloading xmldumps", total=len(files))
