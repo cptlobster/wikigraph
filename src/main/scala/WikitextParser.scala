@@ -2,7 +2,14 @@ import scala.annotation.tailrec
 
 class WikitextParser:
   def read_page(contents: String): List[String] =
-    ???
+    @tailrec def rec_read_page(contents: String, links: List[String]): List[String] =
+      if contents.isEmpty then links else
+        val (link, remainder) = dissect_link(until_brackets(contents))
+        link match
+          case "" => rec_read_page(remainder, links)
+          case _ => rec_read_page(remainder, link :: links)
+
+    rec_read_page(contents, Nil)
 
   @tailrec private def until_brackets(contents: String): String =
     if contents.isEmpty then "" else
