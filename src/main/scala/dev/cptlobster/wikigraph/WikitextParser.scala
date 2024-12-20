@@ -1,5 +1,10 @@
+package dev.cptlobster.wikigraph
+
 import scala.annotation.tailrec
 
+/**
+ * Parser for reading links from a WikiText page
+ */
 case class WikitextParser():
   /**
    * Get all the links present in a single WikiText page.

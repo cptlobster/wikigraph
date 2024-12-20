@@ -9,8 +9,8 @@ lazy val root = project
     scalaVersion := scala3Version,
 
     libraryDependencies ++= Seq(
-      "org.apache.commons" % "commons-compress" % "1.26.1",
-      "org.scala-lang.modules" %% "scala-xml" % "2.2.0",
-      "org.scalameta" %% "munit" % "0.7.29" % Test
+      "org.apache.commons" % "commons-compress" % "1.27.1",
+      "org.scala-lang.modules" %% "scala-xml" % "2.3.0",
+      "org.scalameta" %% "munit" % "1.0.3" % Test
     )
   )
