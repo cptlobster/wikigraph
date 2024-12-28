@@ -1,6 +1,5 @@
 package dev.cptlobster.wikigraph
-import scala.xml.XML
-import dev.cptlobster.wikigraph.WMXMLDumpParser
+import scala.xml.{Node, XML}
 /*
  * XML samples are obtained from Wikipedia's XML dumps and are used under the CC-BY-SA 3.0 License.
  */
@@ -10,14 +9,14 @@ class WMXMLDumpParserSuite extends munit.FunSuite:
   val sampleText1 = "#REDIRECT [[Computer accessibility]]\n\n{{rcat shell|\n{{R from move}}\n{{R from CamelCase}}\n{{R unprintworthy}}\n}}"
 
   test("can convert a single XML page into a Page class") {
-    val obtained: Elem = XML.loadString(sample1).head
+    val obtained: Node = XML.loadString(sample1).head
 
-    val parser: WMXMLDumpParser = WMXMLDumpParser
+    val parser: WMXMLDumpParser = WMXMLDumpParser()
 
-    val page: Page = parser.parsePage(obtained)
+    val page: Page = parser.parse_page(obtained)
 
     assertEquals(clue(page.title), "AccessibleComputing")
-    assertEquals(clue(page.ns), 0)
-    assertEquals(clue(page.id), 0)
+    assertEquals(clue(page.namespace), 0)
+    assertEquals(clue(page.id), 10)
     assertEquals(clue(page.contents), sampleText1)
   }
