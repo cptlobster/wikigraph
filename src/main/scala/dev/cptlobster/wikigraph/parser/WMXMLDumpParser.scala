@@ -1,4 +1,6 @@
-package dev.cptlobster.wikigraph
+package dev.cptlobster.wikigraph.parser
+
+import dev.cptlobster.wikigraph.RawPage
 
 import java.io.InputStream
 import scala.jdk.CollectionConverters.*

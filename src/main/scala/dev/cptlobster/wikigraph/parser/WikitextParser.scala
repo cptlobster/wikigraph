@@ -1,4 +1,4 @@
-package dev.cptlobster.wikigraph
+package dev.cptlobster.wikigraph.parser
 
 import scala.annotation.tailrec
 
