@@ -13,7 +13,7 @@ class WMXMLDumpParserSuite extends munit.FunSuite:
 
     val parser: WMXMLDumpParser = WMXMLDumpParser()
 
-    val page: Page = parser.parse_page(obtained)
+    val page: RawPage = parser.parse_page(obtained)
 
     assertEquals(clue(page.title), "AccessibleComputing")
     assertEquals(clue(page.namespace), 0)
