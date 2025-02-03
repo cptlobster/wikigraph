@@ -29,9 +29,21 @@ def parse_xmldump(src: String): Unit =
   val dbconn: PostgresConnector = PostgresConnector("localhost", 5432, "wikigraph", "wikigraph")
 
   val f = File(src)
-  val s = FileInputStream(f)
 
-  val pages = idxparser.read(s)
+  if (f.isDirectory) {
+    // Get list of files and directories
+    val files = f.listFiles().filter(file => file.getName.contains("index"))
 
-  dbconn.pushPagesNsless(pages)
+    // Iterate over the files and print their names
+    for (file <- files) {
+      val s = FileInputStream(file)
+      val pages = idxparser.read(s)
 
+      dbconn.pushPagesNsless(pages)
+    }
+  } else {
+    val s = FileInputStream(f)
+    val pages = idxparser.read(s)
+
+    dbconn.pushPagesNsless(pages)
+  }

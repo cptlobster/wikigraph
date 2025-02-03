@@ -1,7 +1,7 @@
 -- all pages are stored in a single table
 CREATE TABLE IF NOT EXISTS pages (
     id INT PRIMARY KEY,
-    title VARCHAR(120),
+    title VARCHAR(300),
     namespace INT
 );
 
