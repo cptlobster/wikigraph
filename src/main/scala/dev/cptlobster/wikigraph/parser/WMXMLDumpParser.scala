@@ -1,7 +1,5 @@
 package dev.cptlobster.wikigraph.parser
 
-import dev.cptlobster.wikigraph.RawPage
-
 import java.io.InputStream
 import scala.jdk.CollectionConverters.*
 import scala.xml.{Node, NodeSeq, XML}
@@ -11,7 +9,7 @@ case class RawPage(title: String, id: Int, namespace: Int, contents: String)
 case class WMXMLDumpParser():
   def get_xml(stream: InputStream): NodeSeq =
     val xml = XML.load(stream)
-    xml \ "mediawiki"
+    xml.child
 
   def get_namespaces(nodes: NodeSeq): Map[Int, String] =
     (nodes \ "namespace").map((node: Node) => ((node \@ "key").toInt, node.text)).toMap[Int, String]
