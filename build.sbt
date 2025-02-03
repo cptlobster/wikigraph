@@ -11,6 +11,8 @@ lazy val root = project
     libraryDependencies ++= Seq(
       "org.apache.commons" % "commons-compress" % "1.27.1",
       "org.scala-lang.modules" %% "scala-xml" % "2.3.0",
-      "org.scalameta" %% "munit" % "1.0.3" % Test
+      "org.neo4j.driver" % "neo4j-java-driver" % "5.27.0",
+      "org.postgresql" % "postgresql" % "42.7.5",
+      "org.scalameta" %% "munit" % "1.1.0" % Test
     )
   )
