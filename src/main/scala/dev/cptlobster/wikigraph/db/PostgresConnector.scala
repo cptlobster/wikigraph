@@ -17,20 +17,20 @@ case class PostgresConnector(url: String, port: Int, username: String, password:
     stmt.setInt(1, id)
     stmt.setString(2, title)
 
-    stmt.executeQuery()
+    stmt.executeUpdate()
 
   private def insertPageQuery(stmt: PreparedStatement, page: Page): Unit =
     stmt.setInt(1, page.id)
     stmt.setString(2, page.title)
     stmt.setInt(3, page.namespace)
 
-    stmt.executeQuery()
+    stmt.executeUpdate()
 
   private def insertLinkQuery(stmt: PreparedStatement, from: Int, to: Int): Unit =
     stmt.setInt(1, from)
     stmt.setInt(2, to)
 
-    stmt.executeQuery()
+    stmt.executeUpdate()
 
   def pushPage(page: Page): Unit =
     val connection = DriverManager.getConnection(con_st, props)
