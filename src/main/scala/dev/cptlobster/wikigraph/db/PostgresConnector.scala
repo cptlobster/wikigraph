@@ -45,7 +45,10 @@ case class PostgresConnector(url: String, port: Int, username: String, password:
     val connection = DriverManager.getConnection(con_st, props)
     val stmt = connection.prepareStatement("INSERT INTO pages (id, title, namespace) VALUES (?, ?, ?)")
 
-    for (page <- pages) { insertPageQuery(stmt, page) }
+    for (page <- pages) {
+      insertPageQuery(stmt, page)
+      println(s"Pushed ${page.id}: ${page.title}")
+    }
 
     stmt.close()
     connection.close()
@@ -67,6 +70,7 @@ case class PostgresConnector(url: String, port: Int, username: String, password:
 
     for ((id, title) <- pages) {
       insertPageQuery(stmt, id, title)
+      println(s"Pushed $id: $title")
     }
 
     stmt.close()
@@ -76,7 +80,10 @@ case class PostgresConnector(url: String, port: Int, username: String, password:
     val connection = DriverManager.getConnection(con_st, props)
     val stmt = connection.prepareStatement("INSERT INTO links (l_from, l_to) VALUES (?, ?)")
 
-    for ((from, to) <- links) { insertLinkQuery(stmt, from, to) }
+    for ((from, to) <- links) {
+      insertLinkQuery(stmt, from, to)
+      println(s"Pushed link: $from -> $to")
+    }
 
     stmt.close()
     connection.close()
