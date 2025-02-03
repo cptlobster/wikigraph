@@ -32,6 +32,6 @@ def parse_xmldump(src: String): Unit =
   val s = FileInputStream(f)
 
   val pages = idxparser.read(s)
-  
-  
+
+  dbconn.pushPagesNsless(pages)
 
