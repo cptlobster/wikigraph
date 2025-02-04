@@ -34,7 +34,7 @@ case class PostgresConnector(url: String, port: Int, username: String, password:
 
   def pushPage(page: Page): Unit =
     val connection = DriverManager.getConnection(con_st, props)
-    val stmt = connection.prepareStatement("INSERT INTO pages (id, title, namespace) VALUES (?, ?, ?)")
+    val stmt = connection.prepareStatement("INSERT INTO pages (id, title, namespace) VALUES (?, ?, ?) ON CONFLICT UPDATE")
 
     insertPageQuery(stmt, page)
 
@@ -43,7 +43,7 @@ case class PostgresConnector(url: String, port: Int, username: String, password:
 
   def pushPages(pages: List[Page]): Unit =
     val connection = DriverManager.getConnection(con_st, props)
-    val stmt = connection.prepareStatement("INSERT INTO pages (id, title, namespace) VALUES (?, ?, ?)")
+    val stmt = connection.prepareStatement("INSERT INTO pages (id, title, namespace) VALUES (?, ?, ?) ON CONFLICT UPDATE")
 
     for (page <- pages) {
       insertPageQuery(stmt, page)
@@ -55,7 +55,7 @@ case class PostgresConnector(url: String, port: Int, username: String, password:
 
   def pushPageNsless(page: (Int, String)): Unit =
     val connection = DriverManager.getConnection(con_st, props)
-    val stmt = connection.prepareStatement("INSERT INTO pages (id, title) VALUES (?, ?)")
+    val stmt = connection.prepareStatement("INSERT INTO pages (id, title) VALUES (?, ?) ON CONFLICT UPDATE")
 
     val (id, title) = page
 
@@ -66,7 +66,7 @@ case class PostgresConnector(url: String, port: Int, username: String, password:
 
   def pushPagesNsless(pages: List[(Int, String)]): Unit =
     val connection = DriverManager.getConnection(con_st, props)
-    val stmt = connection.prepareStatement("INSERT INTO pages (id, title) VALUES (?, ?)")
+    val stmt = connection.prepareStatement("INSERT INTO pages (id, title) VALUES (?, ?) ON CONFLICT UPDATE")
 
     for ((id, title) <- pages) {
       insertPageQuery(stmt, id, title)
@@ -78,7 +78,7 @@ case class PostgresConnector(url: String, port: Int, username: String, password:
 
   def pushLinks(links: List[(Int, Int)]): Unit =
     val connection = DriverManager.getConnection(con_st, props)
-    val stmt = connection.prepareStatement("INSERT INTO links (l_from, l_to) VALUES (?, ?)")
+    val stmt = connection.prepareStatement("INSERT INTO links (l_from, l_to) VALUES (?, ?) ON CONFLICT DO NOTHING")
 
     for ((from, to) <- links) {
       insertLinkQuery(stmt, from, to)
