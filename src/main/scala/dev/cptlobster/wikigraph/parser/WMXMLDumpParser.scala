@@ -1,25 +1,24 @@
 package dev.cptlobster.wikigraph.parser
 
+import io.dylemma.spac.Splitter
+import io.dylemma.spac.xml._
+import cats.syntax.apply._
+
 import java.io.InputStream
 import scala.jdk.CollectionConverters.*
-import scala.xml.{Node, NodeSeq, XML}
 
-case class RawPage(title: String, id: Int, namespace: Int, contents: String)
+case class RawPage(title: String, id: Int, rid: Int, namespace: Int, contents: String)
 
-case class WMXMLDumpParser():
-  def get_xml(stream: InputStream): NodeSeq =
-    val xml = XML.load(stream)
-    xml.child
+case class WMXMLDumpParser(stream: InputStream):
+  private val source = JavaxSource.fromInputStream(stream)
 
-  def get_namespaces(nodes: NodeSeq): Map[Int, String] =
-    (nodes \ "namespace").map((node: Node) => ((node \@ "key").toInt, node.text)).toMap[Int, String]
+  implicit val PageParser: XmlParser[RawPage] = (
+    Splitter.xml(* \ "title").text.parseFirst,
+    Splitter.xml(* \ "ns").text.map(_.toInt).parseFirst,
+    Splitter.xml(* \ "id").text.map(_.toInt).parseFirst,
+    Splitter.xml(* \ "revision" \ "id").text.map(_.toInt).parseFirst,
+    Splitter.xml(* \ "revision" \ "text").text.parseFirst
+  ).mapN(RawPage.apply)
 
-  def get_pages(nodes: NodeSeq): Seq[RawPage] =
-    for (node <- nodes if node.label == "page") yield parse_page(node)
-
-  def parse_page(node: Node): RawPage =
-    RawPage(
-      (node \ "title").head.text,
-      (node \ "id").head.text.toInt,
-      (node \ "ns").head.text.toInt,
-      ((node \ "revision").head \ "text").head.text)
+  def getPages: List[RawPage] =
+    Splitter.xml("mediawiki" \ "page").as[RawPage].parseToList.parse(source)

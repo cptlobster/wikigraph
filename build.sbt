@@ -6,14 +6,23 @@ lazy val root = project
     name := "wikigraph",
     version := "0.1.0-SNAPSHOT",
 
-    scalaVersion := scala3Version,
-
-    libraryDependencies ++= Seq(
-      "org.scala-lang.modules" %% "scala-parallel-collections" % "1.2.0",
-      "org.apache.commons" % "commons-compress" % "1.27.1",
-      "org.scala-lang.modules" %% "scala-xml" % "2.3.0",
-      "org.neo4j.driver" % "neo4j-java-driver" % "5.27.0",
-      "org.postgresql" % "postgresql" % "42.7.5",
-      "org.scalameta" %% "munit" % "1.1.0" % Test
-    )
+    scalaVersion := scala3Version
   )
+
+val spacVersion = "0.12.1"
+
+libraryDependencies ++= Seq(
+  // Parallel collections
+  "org.scala-lang.modules" %% "scala-parallel-collections" % "1.2.0",
+  // commons-compress for reading BZip2 compressed files
+  "org.apache.commons" % "commons-compress" % "1.27.1",
+  // SPaC for parsing XML data
+  "io.dylemma" %% "spac-core" % spacVersion,
+  "io.dylemma" %% "xml-spac" % spacVersion,
+  "io.dylemma" %% "xml-spac-javax" % spacVersion,
+  // Database functionality
+  "org.neo4j.driver" % "neo4j-java-driver" % "5.27.0",
+  "org.postgresql" % "postgresql" % "42.7.5",
+  // testing
+  "org.scalameta" %% "munit" % "1.1.0" % Test
+)

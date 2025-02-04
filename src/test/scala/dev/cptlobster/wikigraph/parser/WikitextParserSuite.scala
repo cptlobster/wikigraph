@@ -13,7 +13,7 @@ class WikitextParserSuite extends munit.FunSuite {
 
   // ensure that the WikiText parser works
   test("Can get linktext from a WikiText document") {
-    val obtained = wp.read_page(sample1)
+    val obtained = wp.readPage(sample1)
     // expected link texts
     val expected = "Sundance Film Festival" :: "San Francisco Chronicle" :: "Return of the Secaucus Seven" ::
       "The Big Chill (film)" :: "Sharon Pollack (filmmaker)" :: "independent film" :: "comedy-drama" :: Nil
