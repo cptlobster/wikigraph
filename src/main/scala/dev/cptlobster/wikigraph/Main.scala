@@ -10,7 +10,7 @@ val wtparser: WikitextParser = WikitextParser()
 val idxparser: WMIndexParser = WMIndexParser()
 val dbconn: PostgresConnector = PostgresConnector("localhost", 5432, "wikigraph", "wikigraph")
 
-@main def parse_xmldump(src: String): Unit =
+@main def parseXmlDump(src: String): Unit =
   val f = File(src)
 
   if (f.isDirectory) {
@@ -28,21 +28,22 @@ val dbconn: PostgresConnector = PostgresConnector("localhost", 5432, "wikigraph"
   }
 
 def parsePages(s: InputStream): Unit =
-  val pages = WMXMLDumpParser(s).getPages
-    .filter((rp: RawPage) => rp.namespace == 0)
-    .map((rp: RawPage) =>
-    val links: List[String] = wtparser.readPage(rp.contents)
-    print(s"Parsed ${rp.title}\r")
-    Page(rp.title, rp.id, rp.rid, rp.namespace, links)
-  )
+  WMXMLDumpParser(s).testPages()
+//  val pages = WMXMLDumpParser(s).getPages
+//    .filter((rp: RawPage) => rp.namespace == 0)
+//    .map((rp: RawPage) =>
+//    val links: List[String] = wtparser.readPage(rp.contents)
+//    print(s"Parsed ${rp.title}\r")
+//    Page(rp.title, rp.id, rp.rid, rp.namespace, links)
+//  )
 
-  dbconn.pushPages(pages)
+//  dbconn.pushPages(pages)
+//
+//  for (page <- pages) {
+//    println(s"${page.id} ${page.title}: ${page.linked_pages.mkString("[\"","\",\"","\"]")}")
+//  }
 
-  for (page <- pages) {
-    println(s"${page.id} ${page.title}: ${page.linked_pages.mkString("[\"","\",\"","\"]")}")
-  }
-
-def parse_indexes(src: String): Unit =
+def parseIndexes(src: String): Unit =
   val f = File(src)
 
   if (f.isDirectory) {

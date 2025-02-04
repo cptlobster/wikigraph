@@ -1,11 +1,10 @@
 package dev.cptlobster.wikigraph.parser
 
+import cats.syntax.apply.*
 import io.dylemma.spac.Splitter
-import io.dylemma.spac.xml._
-import cats.syntax.apply._
+import io.dylemma.spac.xml.*
 
 import java.io.InputStream
-import scala.jdk.CollectionConverters.*
 
 case class RawPage(title: String, id: Int, rid: Int, namespace: Int, contents: String)
 
@@ -22,3 +21,6 @@ case class WMXMLDumpParser(stream: InputStream):
 
   def getPages: List[RawPage] =
     Splitter.xml("mediawiki" \ "page").as[RawPage].parseToList.parse(source)
+
+  def testPages(): Unit =
+    Splitter.xml("mediawiki" \ "page").as[RawPage].parseTap(println).parse(source)
