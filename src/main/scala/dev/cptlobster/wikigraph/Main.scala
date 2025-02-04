@@ -4,6 +4,7 @@ import dev.cptlobster.wikigraph.db.PostgresConnector
 import dev.cptlobster.wikigraph.parser.{RawPage, WMIndexParser, WMXMLDumpParser, WikitextParser}
 
 import java.io.{File, FileInputStream}
+import scala.collection.parallel.CollectionConverters._
 
 def parse_xmldump(src: String): Unit =
   val xparser: WMXMLDumpParser = WMXMLDumpParser()
@@ -32,7 +33,7 @@ def parse_xmldump(src: String): Unit =
 
   if (f.isDirectory) {
     // Get list of files and directories
-    val files = f.listFiles().filter(file => file.getName.contains("index"))
+    val files = f.listFiles().toList.par.filter(file => file.getName.contains("index"))
 
     // Iterate over the files and print their names
     for (file <- files) {
