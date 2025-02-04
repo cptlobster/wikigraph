@@ -34,7 +34,7 @@ case class PostgresConnector(url: String, port: Int, username: String, password:
 
   def pushPage(page: Page): Unit =
     val connection = DriverManager.getConnection(con_st, props)
-    val stmt = connection.prepareStatement("INSERT INTO pages (id, title, namespace) VALUES (?, ?, ?) ON CONFLICT UPDATE")
+    val stmt = connection.prepareStatement("INSERT INTO pages (id, title, namespace) VALUES (?, ?, ?) ON CONFLICT (id) DO UPDATE SET title = EXCLUDED.title, namespace = EXCLUDED.namespace")
 
     insertPageQuery(stmt, page)
 
@@ -43,7 +43,7 @@ case class PostgresConnector(url: String, port: Int, username: String, password:
 
   def pushPages(pages: List[Page]): Unit =
     val connection = DriverManager.getConnection(con_st, props)
-    val stmt = connection.prepareStatement("INSERT INTO pages (id, title, namespace) VALUES (?, ?, ?) ON CONFLICT UPDATE")
+    val stmt = connection.prepareStatement("INSERT INTO pages (id, title, namespace) VALUES (?, ?, ?) ON CONFLICT (id) DO UPDATE SET title = EXCLUDED.title, namespace = EXCLUDED.namespace")
 
     for (page <- pages) {
       insertPageQuery(stmt, page)
@@ -55,7 +55,7 @@ case class PostgresConnector(url: String, port: Int, username: String, password:
 
   def pushPageNsless(page: (Int, String)): Unit =
     val connection = DriverManager.getConnection(con_st, props)
-    val stmt = connection.prepareStatement("INSERT INTO pages (id, title) VALUES (?, ?) ON CONFLICT UPDATE")
+    val stmt = connection.prepareStatement("INSERT INTO pages (id, title) VALUES (?, ?) ON CONFLICT (id) DO UPDATE SET title = EXCLUDED.title")
 
     val (id, title) = page
 
@@ -66,7 +66,7 @@ case class PostgresConnector(url: String, port: Int, username: String, password:
 
   def pushPagesNsless(pages: List[(Int, String)]): Unit =
     val connection = DriverManager.getConnection(con_st, props)
-    val stmt = connection.prepareStatement("INSERT INTO pages (id, title) VALUES (?, ?) ON CONFLICT UPDATE")
+    val stmt = connection.prepareStatement("INSERT INTO pages (id, title) VALUES (?, ?) ON CONFLICT (id) DO UPDATE SET title = EXCLUDED.title")
 
     for ((id, title) <- pages) {
       insertPageQuery(stmt, id, title)
