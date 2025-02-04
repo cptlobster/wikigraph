@@ -47,7 +47,7 @@ case class PostgresConnector(url: String, port: Int, username: String, password:
 
     for (page <- pages) {
       insertPageQuery(stmt, page)
-      println(s"Pushed ${page.id}: ${page.title}")
+      print(s"Pushed ${page.id}: ${page.title}\r")
     }
 
     stmt.close()
@@ -70,7 +70,7 @@ case class PostgresConnector(url: String, port: Int, username: String, password:
 
     for ((id, title) <- pages) {
       insertPageQuery(stmt, id, title)
-      println(s"Pushed $id: $title")
+      print(s"Pushed $id: $title\r")
     }
 
     stmt.close()
@@ -82,7 +82,7 @@ case class PostgresConnector(url: String, port: Int, username: String, password:
 
     for ((from, to) <- links) {
       insertLinkQuery(stmt, from, to)
-      println(s"Pushed link: $from -> $to")
+      print(s"Pushed link: $from -> $to\r")
     }
 
     stmt.close()

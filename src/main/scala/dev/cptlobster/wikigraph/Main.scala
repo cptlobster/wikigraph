@@ -15,7 +15,7 @@ val dbconn: PostgresConnector = PostgresConnector("localhost", 5432, "wikigraph"
 
   if (f.isDirectory) {
     // Get list of files and directories
-    val files = f.listFiles().toList.par.filter(file => file.getName.contains(".xml"))
+    val files = f.listFiles().toList.filter(file => file.getName.contains(".xml"))
 
     // Iterate over the files and print their names
     for (file <- files) {
@@ -32,7 +32,7 @@ def parsePages(s: InputStream): Unit =
     .filter((rp: RawPage) => rp.namespace == 0)
     .map((rp: RawPage) =>
     val links: List[String] = wtparser.readPage(rp.contents)
-    println(rp.title)
+    print(s"Parsed ${rp.title}\r")
     Page(rp.title, rp.id, rp.rid, rp.namespace, links)
   )
 
