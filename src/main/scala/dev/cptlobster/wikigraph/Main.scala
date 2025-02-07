@@ -35,7 +35,7 @@ def parsePages(s: InputStream): Unit =
     .filter((rp: RawPage) => rp.namespace == 0)
     .map((rp: RawPage) =>
     val links: List[String] = WikitextParser.readPage(rp.contents)
-    println(s"Parsed ${rp.title}\r")
+    println(s"Parsed ${rp.title}")
     Page(rp.title, rp.id, rp.rid, rp.namespace, links)
   )
   println(s"Got ${pages.size} pages.")

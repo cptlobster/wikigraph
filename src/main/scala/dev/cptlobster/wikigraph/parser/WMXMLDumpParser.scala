@@ -29,7 +29,7 @@ case class WMXMLDumpParser(stream: InputStream):
   def testPages(): Unit =
     MWParser.parseTap(rp => {
       val p = rpToPage(rp)
-      print(s"\r${p.title}: ${p.linked_pages.size} links")
+      println(s"${p.title}: ${p.linked_pages.size} links")
     }).parse(source)
 
   private def rpToPage(rp: RawPage): Page =
