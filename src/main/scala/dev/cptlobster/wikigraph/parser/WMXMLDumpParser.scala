@@ -12,7 +12,6 @@ case class RawPage(title: String, id: Int, rid: Int, namespace: Int, contents: S
 
 case class WMXMLDumpParser(stream: InputStream):
   private val source = JavaxSource.fromInputStream(stream)
-  private val wtparser = WikitextParser()
 
   implicit val PageParser: XmlParser[RawPage] = (
     Splitter.xml(* \ "title").text.parseFirst,
@@ -34,5 +33,5 @@ case class WMXMLDumpParser(stream: InputStream):
     }).parse(source)
 
   private def rpToPage(rp: RawPage): Page =
-    val links: List[String] = wtparser.readPage(rp.contents)
+    val links: List[String] = WikitextParser.readPage(rp.contents)
     Page(rp.title, rp.id, rp.rid, rp.namespace, links)

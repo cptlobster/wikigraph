@@ -1,57 +1,46 @@
 package dev.cptlobster.wikigraph.parser
 
-import scala.annotation.tailrec
+import scala.util.parsing.combinator.RegexParsers
 
-/**
- * Parser for reading links from a WikiText page
- */
-case class WikitextParser():
-  /**
-   * Get all the links present in a single WikiText page.
-   * @param contents WikiText formatted page
-   * @return A list of page titles linked to by this page
-   */
-  def readPage(contents: String): List[String] =
-    @tailrec def recReadPage(contents: String, links: List[String]): List[String] =
-      if contents.isEmpty then links else
-        val (link, remainder) = dissectLink(untilBrackets(contents))
-        link match
-          case "" => recReadPage(remainder, links)
-          case _ => recReadPage(remainder, link :: links)
+object WikitextParser extends RegexParsers:
+  override val skipWhitespace = false
 
-    recReadPage(contents, Nil)
+  def document: Parser[List[String]] =
+    rep(text | link) ^^ { _.flatten }
 
-  /**
-   * Drop all contents before and including the beginning of a link (double square bracket)
-   * @param contents String to extract from
-   * @return All contents to the right of the beginning of the link
-   */
-  @tailrec private def untilBrackets(contents: String): String =
-    if contents.isEmpty then "" else
-      contents.take(2) match
-        case "[[" => contents.drop(2)
-        case _ => untilBrackets(contents.tail)
+  // ignore anything that isn't part of a link
+  def text: Parser[List[String]] =
+    // The regex uses a negative lookahead to stop before a "[[" sequence
+    """(?s)(?:(?!\[\[).)+""".r ^^ { _ => Nil }
 
-  /**
-   * Extract the first possible link from the source string (This requires being called at the beginning of a link to
-   * work properly!)
-   * @param contents String to extract from
-   * @return A tuple containing the link text and the rest of the content. If it fails to reach the end of the link, the
-   *         right side will be empty, if it fails to get the linked page the left side will be empty.
-   */
-  private def dissectLink(contents: String): (String, String) =
-    val (rawlink, rest) = splitFirst(contents, "]]")
-    val (link, _) = splitFirst(rawlink, "|")
-    (link, rest)
+  def link: Parser[List[String]] = "[[" ~> linkBody <~ "]]"
+
+  // the body contains a link and (optionally) display component
+  def linkBody: Parser[List[String]] =
+    (linkTarget ~ opt("|" ~> linkDisplay)) ^^ {
+      case target ~ maybeDisplay =>
+        // return the outer link’s target (trimmed) together with any nested links.
+        target.trim :: maybeDisplay.getOrElse(Nil)
+    }
+
+  // anything before the | or closing brackets
+  def linkTarget: Parser[String] = """(?s).+?(?=(\||]]))""".r
+
+  // The display component is parsed as more text, that could contain more links (i.e. in files)
+  def linkDisplay: Parser[List[String]] =
+    rep(textInLink | link) ^^ { _.flatten }
+
+  // match text until we hit either an opening or closing link
+  def textInLink: Parser[List[String]] =
+    """(?s).+?(?=(\[\[|]]))""".r ^^ { _ => Nil }
 
   /**
-   * Split a string at the first instance of an exactly matching delimiter
-   * @param contents String to split
-   * @param criteria The exact match of what string to split on
-   * @return A tuple containing the left and right sides of the split. If the split fails, the right side will be an
-   *         empty string.
+   * Read a WikiText document and parse the link titles
+   * @param input The WikiText document to read
+   * @return A list of all link titles
    */
-  private def splitFirst(contents: String, criteria: String): (String, String) =
-    @tailrec def sp(con: String, acc: String): (String, String) =
-      if con.isEmpty || con.startsWith(criteria) then (acc, con) else sp(con.tail, acc :+ con.head)
-    sp(contents, "")
+  def readPage(input: String): List[String] =
+    parseAll(document, input) match {
+      case Success(result, _) => result
+      case failure: NoSuccess => sys.error(s"${failure.msg} (at: ${failure.next.pos})")
+    }

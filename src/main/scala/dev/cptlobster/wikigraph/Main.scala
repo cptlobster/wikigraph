@@ -6,7 +6,6 @@ import dev.cptlobster.wikigraph.parser.{RawPage, WMIndexParser, WMXMLDumpParser,
 import java.io.{File, FileInputStream, InputStream}
 import scala.collection.parallel.CollectionConverters.*
 
-val wtparser: WikitextParser = WikitextParser()
 val idxparser: WMIndexParser = WMIndexParser()
 val dbconn: PostgresConnector = PostgresConnector("localhost", 5432, "wikigraph", "wikigraph")
 
@@ -35,7 +34,7 @@ def parsePages(s: InputStream): Unit =
   val pages = WMXMLDumpParser(s).getPages
     .filter((rp: RawPage) => rp.namespace == 0)
     .map((rp: RawPage) =>
-    val links: List[String] = wtparser.readPage(rp.contents)
+    val links: List[String] = WikitextParser.readPage(rp.contents)
     println(s"Parsed ${rp.title}\r")
     Page(rp.title, rp.id, rp.rid, rp.namespace, links)
   )
