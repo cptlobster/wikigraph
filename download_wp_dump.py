@@ -4,6 +4,7 @@ mirror.
 """
 import requests as req
 import json
+import os
 
 from urllib import request
 from bz2 import BZ2Decompressor
@@ -16,7 +17,7 @@ WPDUMP_MIRROR = "dumps.wikimedia.org"
 # Wiki name. Check the mirror's directory tree for this
 WPDUMP_WIKI = "enwiki"
 # Date target, usually in format "YYYYMMDD" or "latest"
-WPDUMP_DATE = "20240401"
+WPDUMP_DATE = "20250201"
 # relative path on host machine; this will default to "wp-data" but you can change it if you have multiple xmldumps
 TARGET_PATH = "wp-data"
 # xmldump to download and unzip
@@ -74,7 +75,12 @@ def download_and_unzip(path: str,
     """Download and unzip a file automatically.
 
     :param path: The relative path of the file to download
-    :returns: True if the file successfully downloads"""
+    :returns: Compressed and uncompressed size of files"""
+    if os.path.exists(f"{TARGET_PATH}/{path.removesuffix('.bz2')}"):
+        if progress:
+            progress.console.print("File already exists, not redownloading.")
+        return (0, 0)
+
     mirror = mirror or WPDUMP_MIRROR
     wiki = wiki or WPDUMP_WIKI
     date = date or WPDUMP_DATE
@@ -82,6 +88,7 @@ def download_and_unzip(path: str,
     dc = BZ2Decompressor()
     leftover = b""
     dc_length = 0
+
     with req.get(url, stream=True) as response:
         length = int(response.headers['Content-Length'])
         if progress:
@@ -99,10 +106,11 @@ def download_and_unzip(path: str,
                     # you should see that 'leftover' is the start of a new stream
                     # we have to start a new decompressor
                     dc = BZ2Decompressor()
-                time.sleep(0.001)
+                #time.sleep(0.001)
     if progress:
+        ratio = length / dc_length * 100
         progress.remove_task(current_dl)
-        progress.console.print(f"Downloaded {sizeof_fmt(length)} ({sizeof_fmt(dc_length)} uncompressed)")
+        progress.console.print(f"Downloaded {sizeof_fmt(length)} ({sizeof_fmt(dc_length)} uncompressed, {ratio:3.1f}% ratio)")
     return (length, dc_length)
 
 
