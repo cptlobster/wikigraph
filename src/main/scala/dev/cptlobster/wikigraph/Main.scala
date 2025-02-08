@@ -5,7 +5,6 @@ import dev.cptlobster.wikigraph.parser.{RawPage, WMIndexParser, WMXMLDumpParser,
 
 import java.io.{File, FileInputStream, InputStream, SequenceInputStream}
 import scala.collection.parallel.CollectionConverters.*
-import scala.jdk.CollectionConverters.*
 
 val idxparser: WMIndexParser = WMIndexParser()
 val dbconn: PostgresConnector = PostgresConnector("localhost", 5432, "wikigraph", "wikigraph")
@@ -17,12 +16,13 @@ val dbconn: PostgresConnector = PostgresConnector("localhost", 5432, "wikigraph"
   if (f.isDirectory) {
     println("Directory detected. Reading XML files...")
     // Get list of files and directories
-    val files = f.listFiles().toList.filter(file => file.getName.contains(".xml")).sortBy(f => f.getName)
-    val streams = files.map(a => FileInputStream(a))
+    val files = f.listFiles().toList.par.filter(file => file.getName.contains(".xml"))
 
     // Iterate over the files and print their names
-    val s = streams.tail.fold(streams.head)((l: InputStream, r: InputStream) => new SequenceInputStream(l, r))
-    parsePages(s)
+    for (file <- files) {
+      val s = FileInputStream(file)
+      parsePages(s)
+    }
   } else {
     println("Single file detected. Reading...")
     val s = FileInputStream(f)
