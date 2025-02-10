@@ -19,6 +19,7 @@ val dbconn: PostgresConnector = PostgresConnector("localhost", 5432, "wikigraph"
     // Get list of files and directories
     val files = f.listFiles().toList.par.filter(file => file.getName.contains(".xml"))
 
+    println("Indexing pages...")
     val hm = hashIndexes(f)
 
     def parseAndPush(s: Page): Unit =
@@ -31,6 +32,7 @@ val dbconn: PostgresConnector = PostgresConnector("localhost", 5432, "wikigraph"
     def parsePages(s: InputStream): Unit =
       WMXMLDumpParser(s).mapPages(parseAndPush)
 
+    println("Parsing page links...")
     // Iterate over the files and print their names
     for (file <- files) {
       val s = FileInputStream(file)
