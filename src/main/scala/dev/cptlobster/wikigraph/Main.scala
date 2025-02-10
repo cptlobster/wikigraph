@@ -1,10 +1,9 @@
 package dev.cptlobster.wikigraph
 
 import dev.cptlobster.wikigraph.db.PostgresConnector
-import dev.cptlobster.wikigraph.parser.{RawPage, WMIndexParser, WMXMLDumpParser, WikitextParser}
+import dev.cptlobster.wikigraph.parser.{WMIndexParser, WMXMLDumpParser}
 
-import java.io.{File, FileInputStream, InputStream, SequenceInputStream}
-import scala.collection.parallel.immutable
+import java.io.{File, FileInputStream, InputStream}
 import scala.collection.parallel.CollectionConverters.*
 
 val idxparser: WMIndexParser = WMIndexParser()
@@ -44,9 +43,9 @@ val dbconn: PostgresConnector = PostgresConnector("localhost", 5432, "wikigraph"
 
   //  dbconn.pushPages(pages)
 
-def hashIndexes(f: File): immutable.ParMap[String, Int] =
+def hashIndexes(f: File): Map[String, Int] =
   val files = f.listFiles().toList.par.filter(file => file.getName.contains(".xml"))
   (for (file <- files;
         (id, title) <- idxparser.read(FileInputStream(file))) yield {
     (title, id)
-  }).toMap
+  }).toMap.seq
