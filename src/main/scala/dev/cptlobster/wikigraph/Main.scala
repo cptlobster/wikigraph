@@ -44,8 +44,7 @@ val dbconn: PostgresConnector = PostgresConnector("localhost", 5432, "wikigraph"
   //  dbconn.pushPages(pages)
 
 def hashIndexes(f: File): Map[String, Int] =
-  val files = f.listFiles().toList.par.filter(file => file.getName.contains(".xml"))
-  (for (file <- files;
-        (id, title) <- idxparser.read(FileInputStream(file))) yield {
-    (title, id)
-  }).toMap.seq
+  val files = f.listFiles().toList.par.filter(file => file.getName.contains("index"))
+  (for (file <- files) yield {
+    idxparser.read(FileInputStream(file)).map((id, title) => (title, id))
+  }).flatten[(String, Int)].toMap.seq

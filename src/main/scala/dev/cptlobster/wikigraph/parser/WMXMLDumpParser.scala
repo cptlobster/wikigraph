@@ -1,10 +1,9 @@
 package dev.cptlobster.wikigraph.parser
 
 import cats.syntax.apply.*
+import dev.cptlobster.wikigraph.Page
 import io.dylemma.spac.Splitter
 import io.dylemma.spac.xml.*
-import dev.cptlobster.wikigraph.Page
-import dev.cptlobster.wikigraph.parser.WikitextParser
 
 import java.io.InputStream
 

@@ -16,5 +16,7 @@ case class WMIndexParser():
 
   def parseLine(line: String): (Int, String) =
     val pattern: Regex = "[0-9]+:([0-9]+):(.+)$".r
-    val res0 = pattern.findAllIn(line)
-    (res0.group(1).toInt, res0.group(2))
+    line match {
+      case pattern(num, rest) => (num.toInt, rest)
+      case _ => throw new IllegalArgumentException(s"Line did not match expected format: $line")
+    }
