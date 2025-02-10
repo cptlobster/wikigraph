@@ -42,5 +42,5 @@ object WikitextParser extends RegexParsers:
   def readPage(input: String): List[String] =
     parseAll(document, input) match {
       case Success(result, _) => result
-      case failure: NoSuccess => sys.error(s"${failure.msg} (at: ${failure.next.pos})")
+      case failure: NoSuccess => throw RuntimeException(s"${failure.msg} (at: ${failure.next.pos})")
     }
