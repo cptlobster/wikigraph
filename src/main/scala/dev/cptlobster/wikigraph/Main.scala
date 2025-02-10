@@ -4,6 +4,7 @@ import dev.cptlobster.wikigraph.db.PostgresConnector
 import dev.cptlobster.wikigraph.parser.{RawPage, WMIndexParser, WMXMLDumpParser, WikitextParser}
 
 import java.io.{File, FileInputStream, InputStream, SequenceInputStream}
+import scala.collection.parallel.immutable
 import scala.collection.parallel.CollectionConverters.*
 
 val idxparser: WMIndexParser = WMIndexParser()
@@ -18,52 +19,32 @@ val dbconn: PostgresConnector = PostgresConnector("localhost", 5432, "wikigraph"
     // Get list of files and directories
     val files = f.listFiles().toList.par.filter(file => file.getName.contains(".xml"))
 
+    val hm = hashIndexes(f)
+
+    def parseAndPush(s: Page): Unit =
+      if s.namespace == 0 then
+        val link_ids = for (title <- s.linked_pages) yield { (s.id, hm(title)) }
+
+        dbconn.pushPage(s)
+        dbconn.pushLinks(link_ids)
+
+    def parsePages(s: InputStream): Unit =
+      WMXMLDumpParser(s).mapPages(parseAndPush)
+
     // Iterate over the files and print their names
     for (file <- files) {
       val s = FileInputStream(file)
       parsePages(s)
     }
   } else {
-    println("Single file detected. Reading...")
-    val s = FileInputStream(f)
-    parsePages(s)
+    throw Exception("Must be a directory")
   }
 
-def parsePages(s: InputStream): Unit =
-  WMXMLDumpParser(s).testPages()
-  val pages = WMXMLDumpParser(s).getPages
-    .filter((rp: RawPage) => rp.namespace == 0)
-    .map((rp: RawPage) =>
-    val links: List[String] = WikitextParser.readPage(rp.contents)
-    println(s"Parsed ${rp.title}")
-    Page(rp.title, rp.id, rp.rid, rp.namespace, links)
-  )
-  println(s"Got ${pages.size} pages.")
+  //  dbconn.pushPages(pages)
 
-  pages.foreach(println)
-//  dbconn.pushPages(pages)
-
-  for (page <- pages) {
-    println(s"${page.id} ${page.title}: ${page.linked_pages.mkString("[\"","\",\"","\"]")}")
-  }
-
-def parseIndexes(src: String): Unit =
-  val f = File(src)
-
-  if (f.isDirectory) {
-    // Get list of files and directories
-    val files = f.listFiles().toList.par.filter(file => file.getName.contains("index"))
-
-    // Iterate over the files and print their names
-    for (file <- files) {
-      val s = FileInputStream(file)
-      val pages = idxparser.read(s)
-
-      dbconn.pushPagesNsless(pages)
-    }
-  } else {
-    val s = FileInputStream(f)
-    val pages = idxparser.read(s)
-
-    dbconn.pushPagesNsless(pages)
-  }
+def hashIndexes(f: File): immutable.ParMap[String, Int] =
+  val files = f.listFiles().toList.par.filter(file => file.getName.contains(".xml"))
+  (for (file <- files;
+        (id, title) <- idxparser.read(FileInputStream(file))) yield {
+    (title, id)
+  }).toMap

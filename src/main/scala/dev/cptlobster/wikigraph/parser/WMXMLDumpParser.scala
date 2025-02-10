@@ -32,6 +32,9 @@ case class WMXMLDumpParser(stream: InputStream):
       println(s"${p.title}: ${p.linked_pages.size} links")
     }).parse(source)
 
+  def mapPages(f: Page => Unit): Unit =
+    MWParser.parseTap(rp => f(rpToPage(rp))).parse(source)
+
   private def rpToPage(rp: RawPage): Page =
     val links: List[String] = WikitextParser.readPage(rp.contents)
     Page(rp.title, rp.id, rp.rid, rp.namespace, links)
