@@ -79,40 +79,27 @@ def download_and_unzip(path: str,
     if os.path.exists(f"{TARGET_PATH}/{path.removesuffix('.bz2')}"):
         if progress:
             progress.console.print("File already exists, not redownloading.")
-        return (0, 0)
+        return 0
 
     mirror = mirror or WPDUMP_MIRROR
     wiki = wiki or WPDUMP_WIKI
     date = date or WPDUMP_DATE
     url = get_wd_url(path, mirror, wiki, date)
-    dc = BZ2Decompressor()
-    leftover = b""
-    dc_length = 0
 
     with req.get(url, stream=True) as response:
         length = int(response.headers['Content-Length'])
         if progress:
             current_dl = progress.add_task(f"Downloading {sizeof_fmt(length)}...", total=length)
-        with open(f"{TARGET_PATH}/{path.removesuffix('.bz2')}", "wb") as f:
+        with open(f"{TARGET_PATH}/{path}", "wb") as f:
             for chunk in response.iter_content(chunk_size=CHUNK_SIZE):
-                decompressed = dc.decompress(leftover + chunk)
-                f.write(decompressed)
-                dc_length += len(decompressed)
-                leftover = b""
+                f.write(chunk)
                 if progress:
                     progress.update(current_dl, advance=CHUNK_SIZE)
-                if dc.eof:
-                    leftover = dc.unused_data
-                    # you should see that 'leftover' is the start of a new stream
-                    # we have to start a new decompressor
-                    dc = BZ2Decompressor()
                 #time.sleep(0.001)
     if progress:
-        ratio = length / dc_length * 100
         progress.remove_task(current_dl)
-        progress.console.print(f"Downloaded {sizeof_fmt(length)} ({sizeof_fmt(dc_length)} uncompressed, {ratio:3.1f}% ratio)")
-    return (length, dc_length)
-
+        progress.console.print(f"Downloaded {sizeof_fmt(length)}")
+    return length
 
 def get_files_in_dump(metadata: dict, dump: str = None) -> list:
     """Get the list of files in a specific xmldump"""
@@ -139,20 +126,16 @@ if __name__ == "__main__":
         files = get_files_in_dump(md)
         overall_task = progress.add_task(f"Downloading {len(files)} files...", total=len(files))
         overall_bytes = 0
-        overall_dc_bytes = 0
         start = time.time()
         for n, path in enumerate(files, start=1):
             progress.console.print(f"({n} / {len(files)}) File {path}")
             nb, ndb = download_and_unzip(path, progress=progress)
             overall_bytes += nb
-            overall_dc_bytes += ndb
             progress.update(overall_task, advance=1)
         end = time.time()
         progress.console.print(f"Download completed.\n\n"
                                f"DOWNLOAD STATISTICS\n"
                                f"Size (compressed): {sizeof_fmt(overall_bytes)}\n"
-                               f"Size (decompressed): {sizeof_fmt(overall_dc_bytes)}"
                                f"Average file size (compressed): {sizeof_fmt(overall_bytes / len(files))}\n"
-                               f"Average file size (decompressed): {sizeof_fmt(overall_dc_bytes / len(files))}\n"
                                f"Total time elapsed: {str(timedelta(seconds=end - start))}\n"
                                f"Average time per file: {str(timedelta(seconds=(end - start) / len(files)))}")
