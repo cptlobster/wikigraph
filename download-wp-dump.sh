@@ -19,12 +19,21 @@ echo $FILES
 
 cd $TARGET_PATH
 
-# get files
-for FILE in "${FILES[@]}"; do
+# this function will be called by xargs to run two downloads at the same time
+function download() {
+  FILE=$1
   TRFILE=$(echo $FILE | tr -d "'")
+  # if the file exists already, skip it
+  if [ -f $TRFILE ]; then
+    return
+  fi
+  # otherwise, download the file
   echo $TRFILE
   curl "$WPDUMP_BASE_URL/$TRFILE" -o "$TRFILE"
-done
+}
+
+# get files
+echo $FILE | xargs -n1 -P2 download
 
 # get MD5 checksums and ensure all files are correct
 curl "$WPDUMP_BASE_URL/$WPDUMP_WIKI-$WPDUMP_DATE-md5sums.txt" -o "sums.md5"
