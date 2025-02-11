@@ -32,8 +32,11 @@ function download() {
   curl "$WPDUMP_BASE_URL/$TRFILE" -o "$TRFILE"
 }
 
+export -f download
+export WPDUMP_BASE_URL
+
 # get files
-echo $FILE | xargs -n1 -P2 download
+printf "%s\n" "${FILES[@]}" | xargs -I {} -n1 -P2 bash -c 'download "{}"'
 
 # get MD5 checksums and ensure all files are correct
 curl "$WPDUMP_BASE_URL/$WPDUMP_WIKI-$WPDUMP_DATE-md5sums.txt" -o "sums.md5"
