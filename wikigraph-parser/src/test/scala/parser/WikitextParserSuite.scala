@@ -1,7 +1,5 @@
 package dev.cptlobster.wikigraph.parser
 
-import dev.cptlobster.wikigraph.parser.WikitextParser
-
 /*
  * WikiText samples are obtained from Wikipedia and are used under the CC-BY-SA 3.0 License.
  */

@@ -1,9 +1,8 @@
 package dev.cptlobster.wikigraph.parser
 
-import scala.util.matching.Regex
-import scala.jdk.StreamConverters._
-
 import java.io.{BufferedReader, InputStream, InputStreamReader}
+import scala.jdk.StreamConverters.*
+import scala.util.matching.Regex
 
 case class WMIndexParser():
   def read(input: InputStream): List[(Int, String)] =

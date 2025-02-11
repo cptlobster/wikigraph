@@ -1,8 +1,8 @@
 package dev.cptlobster.wikigraph.db
 
 import dev.cptlobster.wikigraph.Page
-import org.neo4j.driver.Values.parameters
 import org.neo4j.driver.*
+import org.neo4j.driver.Values.parameters
 
 import java.lang.AutoCloseable
 

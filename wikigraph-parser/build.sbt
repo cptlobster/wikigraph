@@ -1,12 +1,11 @@
-val scala3Version = "3.4.1"
+ThisBuild / version := "0.1.0-SNAPSHOT"
 
-lazy val root = project
-  .in(file("."))
+ThisBuild / scalaVersion := "3.4.1"
+
+lazy val root = (project in file("."))
   .settings(
-    name := "wikigraph",
-    version := "0.1.0-SNAPSHOT",
-
-    scalaVersion := scala3Version
+    name := "wikigraph-parser",
+    idePackagePrefix := Some("dev.cptlobster.wikigraph")
   )
 
 // SPaC version is reused a few times

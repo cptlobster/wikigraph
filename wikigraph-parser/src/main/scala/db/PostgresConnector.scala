@@ -21,8 +21,9 @@ case class PostgresConnector(url: String, port: Int, username: String, password:
 
   private def insertPageQuery(stmt: PreparedStatement, page: Page): Unit =
     stmt.setInt(1, page.id)
-    stmt.setString(2, page.title)
-    stmt.setInt(3, page.namespace)
+    stmt.setInt(2, page.rid)
+    stmt.setString(3, page.title)
+    stmt.setInt(4, page.namespace)
 
     stmt.executeUpdate()
 
@@ -34,7 +35,7 @@ case class PostgresConnector(url: String, port: Int, username: String, password:
 
   def pushPage(page: Page): Unit =
     val connection = DriverManager.getConnection(con_st, props)
-    val stmt = connection.prepareStatement("INSERT INTO pages (id, title, namespace) VALUES (?, ?, ?) ON CONFLICT (id) DO UPDATE SET title = EXCLUDED.title, namespace = EXCLUDED.namespace")
+    val stmt = connection.prepareStatement("INSERT INTO pages (id, rid, title, namespace) VALUES (?, ?, ?, ?) ON CONFLICT (id) DO UPDATE SET title = EXCLUDED.title, namespace = EXCLUDED.namespace, rid = EXCLUDED.rid")
 
     insertPageQuery(stmt, page)
 
@@ -43,7 +44,7 @@ case class PostgresConnector(url: String, port: Int, username: String, password:
 
   def pushPages(pages: List[Page]): Unit =
     val connection = DriverManager.getConnection(con_st, props)
-    val stmt = connection.prepareStatement("INSERT INTO pages (id, title, namespace) VALUES (?, ?, ?) ON CONFLICT (id) DO UPDATE SET title = EXCLUDED.title, namespace = EXCLUDED.namespace")
+    val stmt = connection.prepareStatement("INSERT INTO pages (id, rid, title, namespace) VALUES (?, ?, ?, ?) ON CONFLICT (id) DO UPDATE SET title = EXCLUDED.title, namespace = EXCLUDED.namespace, rid = EXCLUDED.rid")
 
     for (page <- pages) {
       insertPageQuery(stmt, page)
@@ -53,7 +54,7 @@ case class PostgresConnector(url: String, port: Int, username: String, password:
     stmt.close()
     connection.close()
 
-  def pushPageNsless(page: (Int, String)): Unit =
+  def pushPageIndex(page: (Int, String)): Unit =
     val connection = DriverManager.getConnection(con_st, props)
     val stmt = connection.prepareStatement("INSERT INTO pages (id, title) VALUES (?, ?) ON CONFLICT (id) DO UPDATE SET title = EXCLUDED.title")
 
@@ -64,7 +65,7 @@ case class PostgresConnector(url: String, port: Int, username: String, password:
     stmt.close()
     connection.close()
 
-  def pushPagesNsless(pages: List[(Int, String)]): Unit =
+  def pushPageIndexes(pages: List[(Int, String)]): Unit =
     val connection = DriverManager.getConnection(con_st, props)
     val stmt = connection.prepareStatement("INSERT INTO pages (id, title) VALUES (?, ?) ON CONFLICT (id) DO UPDATE SET title = EXCLUDED.title")
 

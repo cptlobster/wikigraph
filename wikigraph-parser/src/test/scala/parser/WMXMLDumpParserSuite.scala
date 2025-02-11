@@ -1,6 +1,10 @@
-package dev.cptlobster.wikigraph.parser
+package dev.cptlobster.wikigraph
+package parser
 
-import dev.cptlobster.wikigraph.parser.{RawPage, WMXMLDumpParser}
+
+
+
+
 /*
  * XML samples are obtained from Wikipedia's XML dumps and are used under the CC-BY-SA 3.0 License.
  */
