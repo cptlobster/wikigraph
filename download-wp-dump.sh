@@ -15,9 +15,7 @@ WPDUMP_BASE_URL="https://$WPDUMP_MIRROR/$WPDUMP_WIKI/$WPDUMP_DATE"
 # get metadata
 FILES=($(curl "$WPDUMP_BASE_URL/dumpstatus.json" | jq -r ".jobs.$WPDUMP_SOURCE.files | keys | .[] | @sh"))
 
-echo $FILES
-
-cd $TARGET_PATH
+pushd $TARGET_PATH
 
 # this function will be called by xargs to run two downloads at the same time
 function download() {
@@ -41,3 +39,5 @@ printf "%s\n" "${FILES[@]}" | xargs -I {} -n1 -P2 bash -c 'download "{}"'
 # get MD5 checksums and ensure all files are correct
 curl "$WPDUMP_BASE_URL/$WPDUMP_WIKI-$WPDUMP_DATE-md5sums.txt" -o "sums.md5"
 md5sums -c sums.md5 --ignore-missing
+
+popd
