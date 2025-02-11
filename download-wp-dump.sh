@@ -13,14 +13,19 @@ WPDUMP_SOURCE="articlesmultistreamdump"
 WPDUMP_BASE_URL="https://$WPDUMP_MIRROR/$WPDUMP_WIKI/$WPDUMP_DATE"
 
 # get metadata
-FILES=$(curl "$WPDUMP_BASE_URL/dumpstatus.json" | jq -r ".jobs.$WPDUMP_SOURCE.files | keys | .[]")
+FILES=($(curl "$WPDUMP_BASE_URL/dumpstatus.json" | jq -r ".jobs.$WPDUMP_SOURCE.files | keys | .[] | @sh"))
+
+echo $FILES
 
 cd $TARGET_PATH
 
 # get files
 for FILE in "${FILES[@]}"; do
-  curl -o "$FILE" "$WPDUMP_BASE_URL/$FILE"
+  TRFILE=$(echo $FILE | tr -d "'")
+  echo $TRFILE
+  curl "$WPDUMP_BASE_URL/$TRFILE" -o "$TRFILE"
+done
 
 # get MD5 checksums and ensure all files are correct
-curl -o "sums.md5" "$WPDUMP_BASE_URL/$WPDUMP_WIKI-$WPDUMP_DATE-md5sums.txt"
+curl "$WPDUMP_BASE_URL/$WPDUMP_WIKI-$WPDUMP_DATE-md5sums.txt" -o "sums.md5"
 md5sums -c sums.md5 --ignore-missing
