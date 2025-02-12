@@ -1,7 +1,7 @@
 package dev.cptlobster.wikigraph
 
 import dev.cptlobster.wikigraph.db.PostgresConnector
-import dev.cptlobster.wikigraph.parser.{WMIndexParser, WMXMLDumpParser}
+import dev.cptlobster.wikigraph.parser.{WMIndexParser, WMXMLDumpParser, RawPage}
 
 import java.io.{File, FileInputStream, InputStream}
 import scala.collection.parallel.CollectionConverters.*
@@ -28,8 +28,10 @@ val dbConn: PostgresConnector = PostgresConnector("localhost", 5432, "wikigraph"
         dbConn.pushPage(s)
         dbConn.pushLinks(link_ids)
 
+    def isMain(rp: RawPage): Boolean = rp.namespace == 0
+
     def parsePages(s: InputStream): Unit =
-      WMXMLDumpParser(s).mapPages(parseAndPush)
+      WMXMLDumpParser(s).filterMapPages(isMain, parseAndPush)
 
     println("Parsing page links...")
     // Iterate over the files and print their names

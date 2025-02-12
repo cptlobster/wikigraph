@@ -35,6 +35,9 @@ case class WMXMLDumpParser(stream: InputStream):
   def mapPages(f: Page => Unit): Unit =
     MWParser.parseTap(rp => f(rpToPage(rp))).parse(source)
 
+  def filterMapPages(f: RawPage => Boolean, m: Page => Unit): Unit =
+    MWParser.parseTap(rp => if f(rp) then m(rpToPage(rp))).parse(source)
+
   private def rpToPage(rp: RawPage): Page =
     try
       val links: List[String] = WikitextParser.readPage(rp.contents)
