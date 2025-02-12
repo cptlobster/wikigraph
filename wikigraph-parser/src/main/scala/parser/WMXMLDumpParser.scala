@@ -36,5 +36,10 @@ case class WMXMLDumpParser(stream: InputStream):
     MWParser.parseTap(rp => f(rpToPage(rp))).parse(source)
 
   private def rpToPage(rp: RawPage): Page =
-    val links: List[String] = WikitextParser.readPage(rp.contents)
-    Page(rp.title, rp.id, rp.rid, rp.namespace, links)
+    try
+      val links: List[String] = WikitextParser.readPage(rp.contents)
+      Page(rp.title, rp.id, rp.rid, rp.namespace, links)
+    catch
+      case e: Exception =>
+        println(s"Exception caught at entry ${rp.title} (${rp.id})")
+        throw e
