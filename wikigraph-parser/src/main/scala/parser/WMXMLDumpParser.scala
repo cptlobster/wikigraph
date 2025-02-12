@@ -1,10 +1,12 @@
-package dev.cptlobster.wikigraph.parser
+package dev.cptlobster.wikigraph
+package parser
 
 import dev.cptlobster.wikigraph.Page
 
 import java.io.InputStream
-import scala.io.dylemma.spac.Splitter
-import scala.io.dylemma.spac.xml.*
+import io.dylemma.spac.Splitter
+import io.dylemma.spac.xml.*
+import cats.syntax.apply._
 
 case class RawPage(title: String, id: Int, rid: Int, namespace: Int, contents: String)
 

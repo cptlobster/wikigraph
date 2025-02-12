@@ -1,4 +1,5 @@
-package dev.cptlobster.wikigraph.parser
+package dev.cptlobster.wikigraph
+package parser
 
 import java.io.{BufferedReader, InputStream, InputStreamReader}
 import scala.jdk.StreamConverters.*

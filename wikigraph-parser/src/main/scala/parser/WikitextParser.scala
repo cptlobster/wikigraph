@@ -1,4 +1,5 @@
-package dev.cptlobster.wikigraph.parser
+package dev.cptlobster.wikigraph
+package parser
 
 import scala.util.parsing.combinator.RegexParsers
 

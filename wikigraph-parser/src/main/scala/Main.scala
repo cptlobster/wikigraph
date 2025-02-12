@@ -6,8 +6,8 @@ import dev.cptlobster.wikigraph.parser.{WMIndexParser, WMXMLDumpParser}
 import java.io.{File, FileInputStream, InputStream}
 import scala.collection.parallel.CollectionConverters.*
 
-val idxparser: WMIndexParser = WMIndexParser()
-val dbconn: PostgresConnector = PostgresConnector("localhost", 5432, "wikigraph", "wikigraph")
+val idxParser: WMIndexParser = WMIndexParser()
+val dbConn: PostgresConnector = PostgresConnector("localhost", 5432, "wikigraph", "wikigraph")
 
 @main def parseXmlDump(src: String): Unit =
   println("WikiGraph XML Parser")
@@ -25,8 +25,8 @@ val dbconn: PostgresConnector = PostgresConnector("localhost", 5432, "wikigraph"
       if s.namespace == 0 then
         val link_ids = for (title <- s.linked_pages) yield { (s.id, hm(title)) }
 
-        dbconn.pushPage(s)
-        dbconn.pushLinks(link_ids)
+        dbConn.pushPage(s)
+        dbConn.pushLinks(link_ids)
 
     def parsePages(s: InputStream): Unit =
       WMXMLDumpParser(s).mapPages(parseAndPush)
@@ -41,10 +41,10 @@ val dbconn: PostgresConnector = PostgresConnector("localhost", 5432, "wikigraph"
     throw Exception("Must be a directory")
   }
 
-  //  dbconn.pushPages(pages)
+  //  dbConn.pushPages(pages)
 
 def hashIndexes(f: File): Map[String, Int] =
   val files = f.listFiles().toList.par.filter(file => file.getName.contains("index"))
   (for (file <- files) yield {
-    idxparser.read(FileInputStream(file)).map((id, title) => (title, id))
+    idxParser.read(FileInputStream(file)).map((id, title) => (title, id))
   }).flatten[(String, Int)].toMap.seq

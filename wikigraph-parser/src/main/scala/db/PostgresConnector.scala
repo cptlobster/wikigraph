@@ -1,4 +1,5 @@
-package dev.cptlobster.wikigraph.db
+package dev.cptlobster.wikigraph
+package db
 
 import dev.cptlobster.wikigraph.Page
 
