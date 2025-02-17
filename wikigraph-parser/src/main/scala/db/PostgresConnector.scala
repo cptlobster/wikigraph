@@ -42,6 +42,7 @@ case class PostgresConnector(url: String, port: Int, username: String, password:
     insertPageQuery(stmt, page)
 
     stmt.close()
+    connection.commit()
     connection.close()
 
   def pushPages(pages: List[Page]): Unit =
@@ -55,6 +56,7 @@ case class PostgresConnector(url: String, port: Int, username: String, password:
     }
 
     stmt.close()
+    connection.commit()
     connection.close()
 
   def pushPageIndex(page: (Int, String)): Unit =
@@ -67,6 +69,7 @@ case class PostgresConnector(url: String, port: Int, username: String, password:
     insertPageQuery(stmt, id, title)
 
     stmt.close()
+    connection.commit()
     connection.close()
 
   def pushPageIndexes(pages: List[(Int, String)]): Unit =
@@ -80,6 +83,7 @@ case class PostgresConnector(url: String, port: Int, username: String, password:
     }
 
     stmt.close()
+    connection.commit()
     connection.close()
 
   def pushLinks(links: List[(Int, Int)]): Unit =
@@ -93,4 +97,5 @@ case class PostgresConnector(url: String, port: Int, username: String, password:
     }
 
     stmt.close()
+    connection.commit()
     connection.close()
