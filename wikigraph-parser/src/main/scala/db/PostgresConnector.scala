@@ -8,7 +8,7 @@ import java.util.Properties
 
 case class PostgresConnector(url: String, port: Int, username: String, password: String):
 
-  val con_st = s"jdbc:postgresql://$url:$port/wikigraph"
+  val conSt = s"jdbc:postgresql://$url:$port/wikigraph"
   val props = new Properties()
 
   props.setProperty("user", username)
@@ -35,7 +35,8 @@ case class PostgresConnector(url: String, port: Int, username: String, password:
     stmt.executeUpdate()
 
   def pushPage(page: Page): Unit =
-    val connection = DriverManager.getConnection(con_st, props)
+    val connection = DriverManager.getConnection(conSt, props)
+    connection.setAutoCommit(true)
     val stmt = connection.prepareStatement("INSERT INTO pages (id, rid, title, namespace) VALUES (?, ?, ?, ?) ON CONFLICT (id) DO UPDATE SET title = EXCLUDED.title, namespace = EXCLUDED.namespace, rid = EXCLUDED.rid")
 
     insertPageQuery(stmt, page)
@@ -44,7 +45,8 @@ case class PostgresConnector(url: String, port: Int, username: String, password:
     connection.close()
 
   def pushPages(pages: List[Page]): Unit =
-    val connection = DriverManager.getConnection(con_st, props)
+    val connection = DriverManager.getConnection(conSt, props)
+    connection.setAutoCommit(true)
     val stmt = connection.prepareStatement("INSERT INTO pages (id, rid, title, namespace) VALUES (?, ?, ?, ?) ON CONFLICT (id) DO UPDATE SET title = EXCLUDED.title, namespace = EXCLUDED.namespace, rid = EXCLUDED.rid")
 
     for (page <- pages) {
@@ -56,7 +58,8 @@ case class PostgresConnector(url: String, port: Int, username: String, password:
     connection.close()
 
   def pushPageIndex(page: (Int, String)): Unit =
-    val connection = DriverManager.getConnection(con_st, props)
+    val connection = DriverManager.getConnection(conSt, props)
+    connection.setAutoCommit(true)
     val stmt = connection.prepareStatement("INSERT INTO pages (id, title) VALUES (?, ?) ON CONFLICT (id) DO UPDATE SET title = EXCLUDED.title")
 
     val (id, title) = page
@@ -67,7 +70,8 @@ case class PostgresConnector(url: String, port: Int, username: String, password:
     connection.close()
 
   def pushPageIndexes(pages: List[(Int, String)]): Unit =
-    val connection = DriverManager.getConnection(con_st, props)
+    val connection = DriverManager.getConnection(conSt, props)
+    connection.setAutoCommit(true)
     val stmt = connection.prepareStatement("INSERT INTO pages (id, title) VALUES (?, ?) ON CONFLICT (id) DO UPDATE SET title = EXCLUDED.title")
 
     for ((id, title) <- pages) {
@@ -79,7 +83,8 @@ case class PostgresConnector(url: String, port: Int, username: String, password:
     connection.close()
 
   def pushLinks(links: List[(Int, Int)]): Unit =
-    val connection = DriverManager.getConnection(con_st, props)
+    val connection = DriverManager.getConnection(conSt, props)
+    connection.setAutoCommit(true)
     val stmt = connection.prepareStatement("INSERT INTO links (l_from, l_to) VALUES (?, ?) ON CONFLICT DO NOTHING")
 
     for ((from, to) <- links) {
