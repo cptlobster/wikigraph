@@ -25,6 +25,7 @@ val dbConn: PostgresConnector = PostgresConnector("localhost", 5432, "wikigraph"
       if s.namespace == 0 then
         val link_ids = for (title <- s.linked_pages) yield { (s.id, hm(title)) }
 
+        println("parseAndPush")
         dbConn.pushPage(s)
         dbConn.pushLinks(link_ids)
 

@@ -36,6 +36,7 @@ case class WMXMLDumpParser(stream: InputStream):
     MWParser.parseTap(rp => f(rpToPage(rp))).parse(source)
 
   def filterMapPages(f: RawPage => Boolean, m: Page => Unit): Unit =
+    println("filterMapPages")
     MWParser.parseTap(rp => if f(rp) then m(rpToPage(rp))).parse(source)
 
   private def rpToPage(rp: RawPage): Page =
