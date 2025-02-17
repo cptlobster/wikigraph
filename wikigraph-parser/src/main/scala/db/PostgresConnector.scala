@@ -18,6 +18,8 @@ case class PostgresConnector(url: String, port: Int, username: String, password:
     stmt.setInt(1, id)
     stmt.setString(2, title)
 
+    println(stmt.toString)
+
     stmt.executeUpdate()
 
   private def insertPageQuery(stmt: PreparedStatement, page: Page): Unit =
@@ -26,11 +28,15 @@ case class PostgresConnector(url: String, port: Int, username: String, password:
     stmt.setString(3, page.title)
     stmt.setInt(4, page.namespace)
 
+    println(stmt.toString)
+
     stmt.executeUpdate()
 
   private def insertLinkQuery(stmt: PreparedStatement, from: Int, to: Int): Unit =
     stmt.setInt(1, from)
     stmt.setInt(2, to)
+
+    println(stmt.toString)
 
     stmt.executeUpdate()
 
